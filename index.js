@@ -6,7 +6,7 @@ const app = express();
 app.use(cors({ optionsSuccessStatus: 200 }));
 app.use(express.static('public'));
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer();
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
@@ -17,13 +17,11 @@ app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
     return res.json({ error: 'No file uploaded' });
   }
 
-  const response = {
+  res.json({
     name: req.file.originalname,
     type: req.file.mimetype,
     size: req.file.size
-  };
-
-  res.json(response);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
