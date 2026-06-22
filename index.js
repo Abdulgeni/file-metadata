@@ -1,23 +1,34 @@
-const port = 3000;
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
 const app = express();
-const multer = require('multer');
-const upload = multer().single('upfile');
 
-app.use(express.static(`${__dirname}/public`));
+// Store file in memory, not disk
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.get('/', (req, res) => {
-  res.sendFile(`${__dirname}/views/index.html`);
+app.use(cors());
+app.use("/public", express.static(process.cwd() + "/public"));
+
+app.get("/", function (req, res) {
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
-app.post('/api/fileanalyse', upload, (req, res) => {
-  if (req.file) {
-    const { originalname: name, mimetype: type, size } = req.file;
-    res.json({ name, type, size });
-  } else {
-    res.json({ error: 'no file selected' });
+app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
+  if (!req.file) {
+    return res.json({ error: "No file uploaded" });
   }
+
+  const respond = {
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size,
+  };
+
+  res.json(respond);
 });
 
-app.listen(port);
-console.log(`Listening on port ${port}`);
+const port = process.env.PORT || 3000;
+app.listen(port, function () {
+  console.log("Your app is listening on port " + port);
+});
