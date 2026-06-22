@@ -1,32 +1,23 @@
+const port = 3000;
 const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
 const app = express();
+const multer = require('multer');
+const upload = multer().single('upfile');
 
-app.use(cors({ optionsSuccessStatus: 200 }));
-app.use(express.static('public'));
-
-const upload = multer();
+app.use(express.static(`${__dirname}/public`));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html');
+  res.sendFile(`${__dirname}/views/index.html`);
 });
 
-app.post('/api/fileanalyse', upload.single('upfile'), (req, res, next) => {
-  if (!req.file) {
-    return res.json({ error: 'No file uploaded' });
+app.post('/api/fileanalyse', upload, (req, res) => {
+  if (req.file) {
+    const { originalname: name, mimetype: type, size } = req.file;
+    res.json({ name, type, size });
+  } else {
+    res.json({ error: 'no file selected' });
   }
-
-  const result = {
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size
-  };
-
-  res.json(result);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(port);
+console.log(`Listening on port ${port}`);
