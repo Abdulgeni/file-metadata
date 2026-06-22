@@ -1,11 +1,14 @@
+// You can submit a form that includes a file upload.
+// Waiting: The form file input field has the name attribute set to upfile.
+// Waiting: When you submit a file, you receive the file name, type, and size in bytes within the JSON response.
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const app = express();
-
-// Store file in memory, not disk
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  dest: "./uploads/",
+});
 
 app.use(cors());
 app.use("/public", express.static(process.cwd() + "/public"));
@@ -13,18 +16,13 @@ app.use("/public", express.static(process.cwd() + "/public"));
 app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
-
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
-  if (!req.file) {
-    return res.json({ error: "No file uploaded" });
-  }
-
+  const file = req.file;
   const respond = {
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size,
+    name: file.originalname,
+    type: file.mimetype,
+    size: file.size,
   };
-
   res.json(respond);
 });
 
