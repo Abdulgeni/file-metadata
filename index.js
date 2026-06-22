@@ -12,16 +12,18 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res, next) => {
   if (!req.file) {
     return res.json({ error: 'No file uploaded' });
   }
 
-  res.json({
+  const result = {
     name: req.file.originalname,
     type: req.file.mimetype,
     size: req.file.size
-  });
+  };
+
+  res.json(result);
 });
 
 const PORT = process.env.PORT || 3000;
