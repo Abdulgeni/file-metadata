@@ -7,18 +7,23 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^8.6.0",
-    "express": "^4.16.4",
+    "express": "^4.22.2",
     "multer": "^2.2.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata"
+    "url": "git+https://github.com/freeCodeCamp/boilerplate-project-filemetadata.git"
   },
   "keywords": [
     "node",
     "express"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata/issues"
+  },
+  "homepage": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata#readme"
 }
