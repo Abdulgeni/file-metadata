@@ -1,51 +1,46 @@
-var express = require('express');
-var cors = require('cors');
-var multer = require('multer'); // Import multer
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
 require('dotenv').config();
 
-var app = express();
+const app = express();
 
-// 1. ENABLE CORS
-// Crucial: The freeCodeCamp test runner needs this to read your API response.
+// 1. CORS MUST be enabled for the FCC test runner to read the JSON response
 app.use(cors());
 
-// 2. SERVE STATIC ASSETS
 app.use('/public', express.static(process.cwd() + '/public'));
 
-// 3. CONFIGURE MULTER
-// We use memoryStorage so we don't need to manage file permissions on disk.
-const upload = multer({ storage: multer.memoryStorage() });
-
-// 4. MAIN PAGE ROUTE
 app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-/**
- * 5. API ENDPOINT: /api/fileanalyse
- * - Must use POST method.
- * - Must use 'upload.single("upfile")' because the HTML form uses name="upfile".
- */
+// 2. Configure Multer
+const upload = multer({ storage: multer.memoryStorage() });
+
+// 3. The API Endpoint
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
   
-  // Debug: Log the file to see if the upload actually happened
-  console.log(req.file);
+  // LOGGING: Check your server console when you click "Run Tests"
+  console.log("Test hit received...");
+  console.log("Req.file:", req.file);
 
-  // validation: check if file exists
+  // FAILURE SAFETY: If req.file is undefined, the test didn't send a file correctly
   if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
+    console.log("No file received");
+    return res.json({ error: "No file uploaded" });
   }
 
-  // 6. RETURN JSON RESPONSE
-  // The keys must strictly match: "name", "type", and "size"
-  res.json({
+  // SUCCESS RESPONSE: Exactly matches Test 4 requirements
+  const fileMetadata = {
     name: req.file.originalname,
     type: req.file.mimetype,
     size: req.file.size
-  });
+  };
+  
+  console.log("Sending response:", fileMetadata);
+  res.json(fileMetadata);
 });
 
-// 7. START SERVER
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log('Your app is listening on port ' + port);
