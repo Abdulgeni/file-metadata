@@ -1,45 +1,46 @@
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer'); // 1. Import multer
+const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
 
+// 1. Cross-Origin Resource Sharing configuration for the FCC test suite
 app.use(cors());
+
+// 2. Serve static files from the public folder
 app.use('/public', express.static(process.cwd() + '/public'));
 
-// 2. Configure Multer to use memory storage (prevents writing files to disk)
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// 3. Configure multer to parse files into memory buffers instead of writing to disk
+const upload = multer({ storage: multer.memoryStorage() });
 
+// 4. Main HTML UI page route
 app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
 /**
- * 3. File Analysis Endpoint
- * The freeCodeCamp automated tests expect the file input 
- * field to have the 'name' attribute set to 'upfile'.
+ * 5. FILE METADATA MICROSERVICE ENDPOINT
+ * Handles the 'upfile' payload sent by the freeCodeCamp test runner.
  */
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
-  try {
-    // If no file was uploaded, return an error
-    if (!req.file) {
-      return res.json({ error: 'Please upload a file' });
-    }
+  const file = req.file;
 
-    // 4. Extract required metadata and return the JSON object
-    res.json({
-      name: req.file.originalname,
-      type: req.file.mimetype,
-      size: req.file.size
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  // Prevent crashes if the test runner sends an empty or malformed payload
+  if (!file) {
+    return res.status(400).json({ error: 'Please select or upload a valid file' });
   }
+
+  // Return the explicit metadata properties expected by test #4
+  res.json({
+    name: file.originalname,
+    type: file.mimetype,
+    size: Number(file.size)
+  });
 });
 
+// 6. Define the network port and boot the server
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
-  console.log('Your app is listening on port ' + port)
+  console.log('Your microservice app is actively listening on port ' + port);
 });
