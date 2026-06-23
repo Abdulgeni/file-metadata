@@ -11,8 +11,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.18.2",
     "multer": "^1.4.5-lts.1"
-  }
-,
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/freeCodeCamp/boilerplate-project-filemetadata.git"
@@ -26,5 +25,10 @@
   "bugs": {
     "url": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata/issues"
   },
-  "homepage": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata#readme"
+  "homepage": "https://github.com/freeCodeCamp/boilerplate-project-filemetadata#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "multer": "^2.2.0"
+  }
 }
