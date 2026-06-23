@@ -1,46 +1,52 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
+var express = require('express');
+var cors = require('cors');
+var multer = require('multer'); // Import multer
 require('dotenv').config();
 
-const app = express();
+var app = express();
 
-// 1. Cross-Origin Resource Sharing configuration for the FCC test suite
+// 1. ENABLE CORS
+// Crucial: The freeCodeCamp test runner needs this to read your API response.
 app.use(cors());
 
-// 2. Serve static files from the public folder
+// 2. SERVE STATIC ASSETS
 app.use('/public', express.static(process.cwd() + '/public'));
 
-// 3. Configure multer to parse files into memory buffers instead of writing to disk
+// 3. CONFIGURE MULTER
+// We use memoryStorage so we don't need to manage file permissions on disk.
 const upload = multer({ storage: multer.memoryStorage() });
 
-// 4. Main HTML UI page route
+// 4. MAIN PAGE ROUTE
 app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
 /**
- * 5. FILE METADATA MICROSERVICE ENDPOINT
- * Handles the 'upfile' payload sent by the freeCodeCamp test runner.
+ * 5. API ENDPOINT: /api/fileanalyse
+ * - Must use POST method.
+ * - Must use 'upload.single("upfile")' because the HTML form uses name="upfile".
  */
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
-  const file = req.file;
+  
+  // Debug: Log the file to see if the upload actually happened
+  console.log(req.file);
 
-  // Prevent crashes if the test runner sends an empty or malformed payload
-  if (!file) {
-    return res.status(400).json({ error: 'Please select or upload a valid file' });
+  // validation: check if file exists
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
   }
 
-  // Return the explicit metadata properties expected by test #4
+  // 6. RETURN JSON RESPONSE
+  // The keys must strictly match: "name", "type", and "size"
   res.json({
-    name: file.originalname,
-    type: file.mimetype,
-    size: Number(file.size)
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size
   });
 });
 
-// 6. Define the network port and boot the server
+// 7. START SERVER
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
-  console.log('Your microservice app is actively listening on port ' + port);
+  console.log('Your app is listening on port ' + port);
 });
